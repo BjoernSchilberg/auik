@@ -15,10 +15,26 @@ jobs:
         id: get_version
         run: |
           echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=VERSION2::${GITHUB_REF#refs/tags/v}
         shell: bash
       - name: Checkout code
         uses: actions/checkout@master
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11' # The JDK version to make available on the path.
+          java-package: jdk # (jre, jdk, or jdk+fx) - defaults to jdk
+          architecture: x64 # (x64 or x86) - defaults to x64
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build with Maven
+        run: |
+          mvn validate && mvn -B package --file pom.xml
+          cp target/*-jar-with-dependencies.jar target/${{ steps.get_version.outputs.VERSION }}.jar
+          ls target/
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -39,21 +55,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./${{ steps.get_version.outputs.VERSION }}.zip
+          asset_path: ./target/${{ steps.get_version.outputs.VERSION }}.zip
           asset_name: ${{ steps.get_version.outputs.VERSION }}.zip
-          asset_content_type: application/zip
-      - name: Update module.json
-        run: |
-          echo ${{ steps.get_version.outputs.VERSION2 }}
-          echo ${{ steps.upload-release-asset.browser_download_url }}
-          sed -i '/"version":/c\  "version": "${{ steps.get_version.outputs.VERSION2 }}",' module.json
-          sed -i '/"download":/c\  "download": "${{ steps.upload-release-asset.browser_download_url }}"' module.json
-          type module.json
-        shell: cmd
-      - name: Push module.json back to Github
-        uses: actions-x/commit@v1
-        with:
-          name: GitHub Actions Autocommitter
-          branch: master
-          files: ./module.json
-          token: ${{ secrets.MY_SECRET_TOKEN }}
+          asset_content_type: application/java-archive
