@@ -33,7 +33,8 @@ jobs:
       - name: Build with Maven
         run: |
           mvn validate && mvn -B package --file pom.xml
-          cp target/*-jar-with-dependencies.jar target/auik_prod-${{ steps.get_version.outputs.VERSION }}.jar
+          cp target/*-jar-with-dependencies.jar target/auik-${{ steps.get_version.outputs.VERSION }}.jar
+          sha256sum target/auik-${{ steps.get_version.outputs.VERSION }}.jar
           ls target/
       - name: Create Release
         id: create_release
@@ -55,6 +56,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./target/auik_prod-${{ steps.get_version.outputs.VERSION }}.jar
-          asset_name: ${{ steps.get_version.outputs.VERSION }}.jar
+          asset_path: ./target/auik-${{ steps.get_version.outputs.VERSION }}.jar
+          asset_name: auik-${{ steps.get_version.outputs.VERSION }}.jar
           asset_content_type: application/java-archive
