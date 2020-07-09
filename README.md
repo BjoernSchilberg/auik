@@ -1,3 +1,5 @@
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/stadt-bielefeld/auik)
+
 # Willkommen zu AUI-K
 
 [![License](https://img.shields.io/badge/License-LGPL%20v2.1-blue.svg)][license]
