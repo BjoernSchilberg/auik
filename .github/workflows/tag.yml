@@ -11,6 +11,12 @@ jobs:
     name: Create Release
     runs-on: windows-latest
     steps:
+      - name: Get Version
+        id: get_version
+        run: |
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          echo ::set-output name=VERSION2::${GITHUB_REF#refs/tags/v}
+        shell: bash
       - name: Checkout code
         uses: actions/checkout@master
       - name: Create Release
@@ -26,3 +32,28 @@ jobs:
             "Wir haben Fehlen behoben, die Leistung gesteigert, den Müll runtergebracht und den Rasen gemäht – Zeit für ein Nickerchen"
           draft: true
           prerelease: true
+      - name: Upload Release Assets
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./${{ steps.get_version.outputs.VERSION }}.zip
+          asset_name: ${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
+      - name: Update module.json
+        run: |
+          echo ${{ steps.get_version.outputs.VERSION2 }}
+          echo ${{ steps.upload-release-asset.browser_download_url }}
+          sed -i '/"version":/c\  "version": "${{ steps.get_version.outputs.VERSION2 }}",' module.json
+          sed -i '/"download":/c\  "download": "${{ steps.upload-release-asset.browser_download_url }}"' module.json
+          type module.json
+        shell: cmd
+      - name: Push module.json back to Github
+        uses: actions-x/commit@v1
+        with:
+          name: GitHub Actions Autocommitter
+          branch: master
+          files: ./module.json
+          token: ${{ secrets.MY_SECRET_TOKEN }}
