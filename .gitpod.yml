@@ -1,0 +1,6 @@
+tasks:
+  - init: mvn validate && mvn -B package --file pom.xml
+
+vscode:
+  extensions:
+    - odind.vsc-moonrise-theme@0.1.5:v1S6YeOIWftngN2XLU5nEA==
