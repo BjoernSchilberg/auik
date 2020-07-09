@@ -1,5 +1,5 @@
 tasks:
-  - init: mvn install -DskipTests=false
+  - init: mvn validate && mvn -B package --file pom.xml
 
 vscode:
   extensions:
