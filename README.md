@@ -41,7 +41,7 @@ git push --tags
 
 Das AUIK JAVA Archive (`auik-v1.0.0.jar`) und die SHA-256 Prüfsumme
 (`auik-v1.0.0.jar.sha256sum`) wird dabei automatisch an den Release gehängt.
-Die Quelltext werden nach dem Veröffentlichen des Release beigefügt.
+Die Quelltexte werden nach dem Veröffentlichen des Release beigefügt.
 
 Anschließend den Release auf der Seite
 <https://github.com/stadt-bielefeld/auik/releases> auswählen, bearbeiten
