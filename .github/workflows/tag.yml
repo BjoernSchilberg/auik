@@ -35,7 +35,7 @@ jobs:
           mvn validate && mvn -B package --file pom.xml
           cp target/*-jar-with-dependencies.jar target/auik-${{ steps.get_version.outputs.VERSION }}.jar
           cd target
-          sha256sum auik-${{ steps.get_version.outputs.VERSION }}.jar > auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256
+          sha256sum -b auik-${{ steps.get_version.outputs.VERSION }}.jar > auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256sum
           ls
       - name: Create Release
         id: create_release
