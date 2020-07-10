@@ -36,7 +36,7 @@ jobs:
           cp target/*-jar-with-dependencies.jar target/auik-${{ steps.get_version.outputs.VERSION }}.jar
           cd target
           sha256sum auik-${{ steps.get_version.outputs.VERSION }}.jar > auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256
-          ls target/
+          ls
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
