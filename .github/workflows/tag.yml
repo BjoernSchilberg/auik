@@ -34,7 +34,8 @@ jobs:
         run: |
           mvn validate && mvn -B package --file pom.xml
           cp target/*-jar-with-dependencies.jar target/auik-${{ steps.get_version.outputs.VERSION }}.jar
-          sha256sum target/auik-${{ steps.get_version.outputs.VERSION }}.jar
+          cd target
+          sha256sum auik-${{ steps.get_version.outputs.VERSION }}.jar > auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256
           ls target/
       - name: Create Release
         id: create_release
@@ -50,7 +51,7 @@ jobs:
           draft: true
           prerelease: true
       - name: Upload Release Assets
-        id: upload-release-asset
+        id: upload-release-asset-jar
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,3 +60,13 @@ jobs:
           asset_path: ./target/auik-${{ steps.get_version.outputs.VERSION }}.jar
           asset_name: auik-${{ steps.get_version.outputs.VERSION }}.jar
           asset_content_type: application/java-archive
+      - name: Upload Release Assets
+        id: upload-release-asset-sha256
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./target/auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256
+          asset_name: auik-${{ steps.get_version.outputs.VERSION }}.jar.sha256
+          asset_content_type: text/plain
